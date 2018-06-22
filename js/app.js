@@ -1,3 +1,8 @@
+//player moving direction in pixels
+const horizon_step = 101;
+const vert_step = 86;
+const row_position = [vert_step*0.5,vert_step*1.5,vert_step*2.5];
+
 // Enemies our player must avoid
 var Enemy = function() {
     // Variables applied to each of our instances go here,
@@ -6,12 +11,17 @@ var Enemy = function() {
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
+    //initiate position, behind the left boundary and random row of starting
+    this.x = -101;
+    this.y = row_position[Math.round(Math.random()*2)%3];
+    //vary in speed 100-500 pixel/dt
+    this.speed = 100+Math.round(Math.random()*4)*100;
 };
 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
 Enemy.prototype.update = function(dt) {
-    this.x = this.x + 101*dt;
+    this.x = this.x + this.speed*dt;
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
@@ -39,41 +49,43 @@ Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
 
+Player.prototype.resetPosition = function() {
+    this.x = horizon_step*2;
+    this.y = vert_step*4.5;
+}
+
 Player.prototype.handleInput = function(direction) {
     switch(direction) {
         case "left":
-            this.x = this.x-101;
+            if (this.x>0)
+                this.x = this.x-horizon_step;
             break;
         case "right":
-            this.x = this.x+101;
+            if (this.x<horizon_step*4)
+                this.x = this.x+horizon_step;
             break;
         case "up":
-            this.y = this.y - 83;
+            if (this.y>vert_step*0.5)
+                this.y = this.y - vert_step;
+            else
+                this.resetPosition();
             break;
         case "down":
-            this.y = this.y + 83;
+            if (this.y<vert_step*4.5)
+                this.y = this.y + vert_step;
             break;
     }
-
 }
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-debugger;
-const allEnemies = [];
-const row_position = [60,140,220]
-for(let i=0;i<3;i++) {
-    let temp = new Enemy;
-    temp.x=0;
-    temp.y=row_position[Math.round(Math.random()*2)%3];
-    allEnemies.push(temp);
-}
-
+let allEnemies = [];
+for (let i=0;i<3;i++)
+    allEnemies.push(new Enemy);
 
 const player = new Player();
-player.x = 200;
-player.y = 400;
+player.resetPosition();
 
 
 // This listens for key presses and sends the keys to your

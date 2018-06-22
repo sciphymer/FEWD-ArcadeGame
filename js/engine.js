@@ -12,7 +12,7 @@
  * This engine makes the canvas' context (ctx) object globally available to make
  * writing app.js a little simpler to work with.
  */
-debugger;
+
 var Engine = (function(global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
@@ -83,9 +83,10 @@ var Engine = (function(global) {
     }
 
     function checkCollisions(){
-        allEnemies.forEach(function(ememy) {
-            if (ememy.x == player.x && ememy.y==player.y)
-                reset();
+        allEnemies.forEach(function(enemy) {
+            // if (enemy.x == player.x && Math.abs(enemy.y-player.x)<=40)
+            if (Math.abs(player.x-enemy.x)<=30 && enemy.y==player.y)
+                player.resetPosition();
         })
     }
     /* This is called by the update function and loops through all of the
@@ -96,9 +97,15 @@ var Engine = (function(global) {
      * render methods.
      */
     function updateEntities(dt) {
-        allEnemies.forEach(function(enemy) {
+        temp_allEnemies=[];
+        allEnemies.forEach(function(enemy, index, allEnemies_array) {
             enemy.update(dt);
+            if (enemy.x>horizon_step*5)
+                temp_allEnemies.push(new Enemy);
+            else
+                temp_allEnemies.push(enemy);
         });
+        allEnemies = temp_allEnemies.slice();
         player.update();
     }
 
